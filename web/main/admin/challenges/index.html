@@ -1,0 +1,528 @@
+<ad-title>Challenges - Admin</ad-title>
+<ad-name>Judge for Admin</ad-name>
+
+<div class="header">
+    <div class="buttons">
+        <button id="Button_CreateChallenge">Create</button>
+    </div>
+    <div class="title">Challenges</div>
+    <input id="Input_Search" type="search" placeholder="Search challenges" autocorrect="off" autocomplete="off">
+</div>
+
+<div class="content">
+    <div class="items">
+        <div class="item placeholder"></div>
+        <div class="item placeholder"></div>
+        <div class="item placeholder"></div>
+        <div class="item placeholder"></div>
+    </div>
+</div>
+
+<div id="PopOver_CreateChallenge" class="popover">
+    <div class="title">
+        <button id="Button_CancelCreateChallenge" class="plain">Cancel</button>
+        <span>New Challenge</span>
+        <button id="Button_DoneCreateChallenge" class="plain">
+            <div class="progressring"></div>
+            <span>Create</span>
+        </button>
+    </div>
+    <div class="content">
+        <div class="list">
+            <div class="stack">
+                <input id="Input_CreateChallengeName" class="plain" type="text" placeholder="Name"/>
+            </div>
+            <div class="stack">
+                <input id="Input_CreateChallengeTopic" class="plain" type="text" placeholder="Topic"/>
+            </div>
+            <div class="stack">
+                <div>Author</div>
+                <div id="Grid_CreateChallengeAuthor">
+                    <img src="/avatar/<#? activeuser.id ?#>"/>
+                    <span><#? activeuser.nickname ?#></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .items
+    {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        transition: 0.25s opacity;
+    }
+    .items.loading
+    {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    .searching .items:empty
+    {
+        display: grid;
+        height: 100%;
+        grid-auto-rows: max-content;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        gap: 0.25em;
+        text-align: center;
+    }
+        .searching .items:empty:before
+        {
+            content: "No Results";
+            font-family: var(--font-bold);
+            font-size: 1.5em;
+        }
+        .searching .items:empty:after
+        {
+            content: "Try a new search.";
+            font-size: 1.12em;
+            color: var(--foreground-description);
+        }
+        .items .item
+        {
+            display: grid;
+            position: relative;
+            grid-template-areas: 
+                "topic topic"
+                "name name"
+                "snippet snippet"
+                "author action";
+            grid-auto-columns: minmax(0, 1fr) 30px;
+            grid-auto-rows: max-content max-content auto max-content max-content;
+            width: 275px;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.045);
+            padding: calc(1.3em - 10px) 1.25em 1.3em;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        [theme=dark] .items .item 
+        {
+            background: var(--overlay-7);
+        }
+        .items .item.placeholder 
+        {
+            height: 320px;
+            animation: loading 1.25s alternate infinite;
+        }
+            .items .item .hover
+            {    
+                position: absolute;
+                display: block;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
+            .items .item .hover:hover
+            {        
+                background: var(--overlay-6);
+            }
+            [theme=dark]
+            .items .item .hover:hover
+            {        
+                background: var(--overlay-8);
+            }
+            .items .item .hover:active
+            {    
+                background: var(--overlay-5);
+            }
+            [theme=dark]
+            .items .item .hover:active
+            {        
+                background: var(--overlay-8);
+            }
+            .items .item .name
+            {    
+                grid-area: name;
+                font-size: 1.2em;
+                font-family: var(--font-bold);
+            }
+            .items .item .topic
+            {
+                grid-area: topic;
+                display: block;
+                height: 1.2em;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                margin: 1em 0 -10px;
+                font-size: 0.8em;
+                font-family: var(--font-semibold);
+                letter-spacing: 0.05em;
+                color: var(--foreground-description);
+            }
+            .items .item .snippet
+            {
+                grid-area: snippet;
+                height: calc(9 * 1.35em);
+                line-height: 1.35em;
+                overflow: hidden;
+                margin: 0 0 0.35em;
+                white-space: pre-line;
+            }
+            .items .item .author
+            {
+                grid-area: author;
+                display: grid;
+                grid-template-areas:
+                    "img name"
+                    "img time";
+                grid-auto-flow: column;
+                grid-auto-columns: calc(30px + 0.65em) auto;
+                align-items: center;
+            }
+                .items .item .author img
+                {
+                    grid-area: img;
+                    background: var(--overlay-8);
+                    aspect-ratio: 1 / 1;
+                    border-radius: 100%;
+                    width: 30px;
+                    height: 30px;
+                }
+                .items .item .author .nickname
+                {
+                    grid-area: name;
+                }
+                .items .item .author .time
+                {
+                    grid-area: time;
+                    font-size: 0.85em;
+                    color: var(--foreground-description);
+                }
+            .items .item .action
+            {
+                grid-area: action;  
+                border-radius: 100%;
+                height: 30px;
+                width: 30px;
+                font-size: 0.8em;
+                color: var(--foreground-description);
+                align-self: center;
+                z-index: 1;
+            }
+    #PopOver_CreateChallenge
+    {
+        display: block;
+    }
+        #PopOver_CreateChallenge #Grid_CreateChallengeAuthor
+        {
+            display: grid;
+            grid-auto-flow: column;
+            gap: 0.5em;
+            align-items: center;
+        }
+            #PopOver_CreateChallenge #Grid_CreateChallengeAuthor img
+            {
+                width: 1.5em;
+                border-radius: 100%;
+                aspect-ratio: 1 / 1;
+            }
+        #PopOver_CreateChallenge #Button_DoneCreateChallenge
+        {
+            position: relative;
+        }
+            #PopOver_CreateChallenge #Button_DoneCreateChallenge .progressring
+            {
+                width: 1em;
+                height: 1em;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            #PopOver_CreateChallenge:not(.loading) #Button_DoneCreateChallenge > .progressring
+            {
+                display: none;
+            }
+            #PopOver_CreateChallenge.loading #Button_DoneCreateChallenge > span
+            {
+                opacity: 0.3;
+            }
+
+    @media screen and (max-width: 945px)
+    {
+        .items .item 
+        {
+            width: calc(100% + var(--padding) * 2);
+            margin: 0 calc(var(--padding) * -1);
+            padding: 0 var(--padding);
+            background: transparent !important;
+            border-radius: 0;
+            overflow: unset;
+            grid-template-areas: 
+                "topic action"
+                "name action"
+                "snippet snippet"
+                "author x"
+                "progress progress";
+        }
+            .items .item:not(:first-child):after
+            {
+                content: "";
+                position: absolute;
+                top: -7.5px;
+                left: var(--padding);
+                right: var(--padding);
+                height: 1px;
+                background: var(--overlay-6);
+            }
+            .items .item .snippet 
+            {
+                height: calc(5* 1.35em);
+            }
+            .items .item .action
+            {
+                transform: translateY(1em);
+            }
+            .items .item .progress
+            {
+                background: transparent;
+                margin: 0;
+                padding: 0;
+                height: 30px;
+            }
+    }
+
+    @keyframes loading 
+    {
+        from 
+        {
+            background: var(--overlay-8);
+        }    
+        to 
+        {
+            background: var(--overlay-6);
+        }    
+    }
+</style>
+
+<script>
+    let searchTimeout = null;
+    let originalItems;
+
+    Input_Search.oninput = function()
+    {
+        clearTimeout(searchTimeout);
+        if (this.value == "")
+        {
+            $(".items").html(originalItems);
+            $(".items").removeClass("loading");
+        }
+        else
+        {
+            $(".items").addClass("loading");
+            searchTimeout = setTimeout(function()
+            {
+                Challenge_Load(Input_Search.value.trim());
+                $(".items").removeClass("loading");
+            }, 500);
+        }
+    }
+
+    function Challenge_Load(query = "")
+    {
+        $.ajax({
+            method: "POST",
+            url: "/challenges/get",
+            data: 
+            {
+                query: query
+            },
+            success: data => 
+            {
+                $(".items").html("");
+
+                data.forEach(challenge => 
+                {
+                    let action = document.createElement("button");
+                    let icon = document.createElement("span");
+                    icon.classList.add("icon");
+                    icon.innerHTML = "\uf153";
+                    action.classList.add("action");
+                    action.append(icon);
+                    
+                    Components.ContextMenu.Add(
+                        "Context_Asssignment",
+                        [
+                            {
+                                Title: "Edit",
+                                Icon: "f7cf",
+                                Action: (element) => { window.location.href = "/admin/challenges/edit?id=" + element.data.id }
+                            },
+                            {
+                                Title: "Share",
+                                Show: "share" in navigator,
+                                Icon: "fb88",
+                                Action: (element) => {
+                                    
+                                    let title = element.data.name;
+                                    let author = challenge.author.nickname;
+                                    let text = "Can you solve this problem?";
+    
+                                    navigator.share({
+                                        title: title,
+                                        text: text + "\n\n" + title + " by " + author + "\n",
+                                        url: "https://agapedimas.com/j/" + challenge.id,
+                                    })
+                                }
+                            },
+                            "Separator",
+                            {
+                                Title: "Delete",
+                                Icon: "fd3c",
+                                Action: (element) => 
+                                { 
+                                    Components.ActionSheet.Open(
+                                    {
+                                        Title: "Delete \"" + element.data.name + "\"?",
+                                        Description: "This challenge will be deleted from server and can't be recovered.",
+                                        Actions: [
+                                            { 
+                                                Title: "Delete", Type: "Options.Critical", 
+                                                Action: o => 
+                                                { 
+                                                    $.ajax({
+                                                        method: "POST",
+                                                        url: "/challenges/delete",
+                                                        data: { id: element.data.id },
+                                                        success: o => window.location.reload()
+                                                    });
+                                                } 
+                                            },
+                                            { 
+                                                Title: "Cancel", Type: "Footer", 
+                                                Action: Components.ActionSheet.Close
+                                            }
+                                        ]
+                                    });
+                                },
+                                Type: "critical"
+                            }
+                        ]
+                    )
+    
+                    let img = document.createElement("img");
+                    img.src = "/avatar/" + challenge.author.id;
+    
+                    let username = document.createElement("span");
+                    username.innerHTML = challenge.author.nickname;
+                    
+                    let time = document.createElement("span");
+                    time.classList.add("time");
+                        
+                    let t1 = parseInt(challenge.time);
+                    let t2 = new Date(Date.now() - challenge.time);
+                    time.append(t2 > 1000 * 3600 * 24 * 6 ? moment(t1).format("ll") : moment(t1).fromNow());
+    
+                    let author = document.createElement("div");
+                    author.classList.add("author");
+                    author.append(img);
+                    author.append(username);
+                    author.append(time);
+    
+                    let topic = document.createElement("span");
+                    topic.classList.add("topic");
+                    topic.innerHTML = challenge.topic;
+    
+                    let name = document.createElement("span");
+                    name.classList.add("name");
+                    name.innerHTML = challenge.name;
+    
+                    let snippet = document.createElement("span");
+                    snippet.classList.add("snippet");
+                    snippet.innerHTML = challenge.snippet;
+    
+                    let hover = document.createElement("div");
+                    hover.classList.add("hover");
+    
+                    let container = document.createElement("div");
+                    container.classList.add("item");
+                    container.append(hover);
+                    container.append(author);
+                    container.append(topic);
+                    container.append(name);
+                    container.append(snippet);
+                    container.append(action);
+    
+                    container.data = challenge;
+    
+                    action.onclick = (e) => Components.ContextMenu.Open("Context_Asssignment", container, e);
+                    container.oncontextmenu = (e) => Components.ContextMenu.Open("Context_Asssignment", container, e);
+                    $(hover).attr("goto", "/admin/challenges/" + challenge.id);
+    
+                    $(".items").append(container);
+                });
+                
+                if (query == "")
+                    originalItems = $(".items").html();
+            }
+        })
+    }
+
+    Challenge_Load();
+
+    Input_CreateChallengeName.onkeydown = function(e)
+    {
+        if (e.key == "Enter")
+            Input_CreateChallengeTopic.focus();
+    }
+    Input_CreateChallengeTopic.onkeydown = function(e)
+    {
+        if (e.key == "Enter")
+            Button_DoneCreateChallenge.click();
+    }
+
+    Button_CreateChallenge.onclick = function() { Components.PopOver.Open(PopOver_CreateChallenge, this); Input_CreateChallengeName.value = ""; Input_CreateChallengeName.focus(); Input_CreateChallengeTopic.value = ""; };
+    Button_CancelCreateChallenge.onclick = function() { Components.PopOver.Close(PopOver_CreateChallenge) };
+    Button_DoneCreateChallenge.onclick = function() 
+    { 
+        $("#PopOver_CreateChallenge").addClass("loading");
+        $("#PopOver_CreateChallenge .title button").attr("disabled", "");
+
+        $.ajax({
+            method: "POST",
+            url: "/challenges/create",
+            data: 
+            {
+                name: Input_CreateChallengeName.value,
+                topic: Input_CreateChallengeTopic.value
+            },
+            success: function(data)
+            {
+                $("#PopOver_CreateChallenge").removeClass("loading");
+                $("#PopOver_CreateChallenge .title button").removeAttr("disabled");
+                Components.PopOver.Close(PopOver_CreateChallenge);
+                window.location.href = "/admin/challenges/edit?id=" + data;
+            },
+            error: function(data)
+            {
+                if (data.status == 0)
+                {
+                    Components.Notification.Send({
+                        Title: "Failed to Create",  
+                        Message: "You're offline. Connect to the internet to create a new challenge.", 
+                        Icon: "\ufe64",
+                        Id: "Challenge_Create"
+                    })
+                }
+                else
+                {
+                    Components.Notification.Send({
+                        Title: "Failed to Create",  
+                        Message: "Something went wrong while creating a new challenge.", 
+                        Icon: "\ufe64",
+                        Id: "Challenge_Create"
+                    })
+                }
+                $("#PopOver_CreateChallenge").removeClass("loading");
+                $("#PopOver_CreateChallenge .title button").removeAttr("disabled");
+            }
+        })
+    };
+</script>
