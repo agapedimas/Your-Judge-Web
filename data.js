@@ -4,8 +4,7 @@ const Variables = require("./variables");
 const Functions = require("./functions");
 const Template = require("./template");
 const fs = require("fs");
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
+const { NodeHtmlMarkdown } = require("node-html-markdown");
 
 //    Functions
 function Data(Server) 
@@ -250,9 +249,13 @@ function Data(Server)
 
             if (problem != "")
             {
-                const dom = new JSDOM("<!DOCTYPE html><div id='main'>" + problem.replace(/\>\</g, ">&nbsp;<") + "</div>");
-                snippet = dom.window.document.querySelector("#main").textContent.replace(/\xa0/g, "\n");
-                snippet = snippet.replace(/\n\n/g, "\n");
+                snippet = NodeHtmlMarkdown.translate(problem, 
+                {
+                    codeFence: "\u200e",
+                    bulletMarker: "\u200e",
+                    emDelimiter: "\u200e",
+                    strongDelimiter: "\u200e"
+                });
                 
                 if (snippet.toLowerCase().indexOf("spesifikasi masukan") > -1)
                     snippet = snippet.substring(0, snippet.toLowerCase().indexOf("spesifikasi masukan"));
