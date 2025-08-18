@@ -66,6 +66,10 @@
         display: grid;    
         grid-auto-rows: 100%;
     }
+    .root .main .activity
+    {
+        grid-auto-rows: max-content auto;
+    }
     .root .main .activity > .content
     {    
         position: relative;
@@ -549,6 +553,7 @@ public class ${data.name.replace(/[^a-zA-Z]/g, "")}
         data: {},
         success: data => 
         {
+            Header_ChallengeTopic.innerHTML = data.topic;
             Header_ChallengeName.innerHTML = data.name;
             Grid_ChallengeProblem.innerHTML = "<div>" + data.problem + "</div>";
             Image_ChallengeAuthor.src = "/avatar/" + data.author.id;
