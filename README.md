@@ -8,8 +8,8 @@ Judge is an open source project. It uses Node.js and MySQL.
 Judge is live now on [judge.agapedimas.com](https://judge.agapedimas.com). It's also available in Windows application, refer to [agapedimas/Your-Judge-Windows](https://github.com/agapedimas/Your-Judge-Windows).
 
 ### Screenshots
-<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/cb7e984f-b543-43d9-87f4-25f3233fab33" />
-<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/fe767d7f-a92d-49e7-9960-9d7bc4b56697" />
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/1d1a9d01-014b-4ac0-a668-56c5b5dec9d1" />
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/eb798c8c-3e75-4e70-ad6f-08b8d29fa5f0" />
 
 ## Key Features
 - **Diverse Challenges:**
